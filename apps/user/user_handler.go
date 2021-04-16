@@ -2,7 +2,6 @@ package user
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/labstack/echo/v4"
@@ -36,15 +35,7 @@ func PostUserRegistration(c echo.Context) error {
 	}
 
 	// TODO development: createUser
-	newUser := User{
-		Name:            req.Name,
-		Address:         req.Address,
-		Photo:           "",
-		Email:           req.Email,
-		EmailVerifiedAt: time.Now(),
-		Password:        req.Password,
-		Role:            "",
-	}
+	newUser, _ := signUp(req)
 
 	// TODO development: authToken
 	authToken := "12345678"
@@ -59,4 +50,10 @@ func PostUserRegistration(c echo.Context) error {
 
 func PostUserLogin(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.M{"message": "user-login"})
+}
+
+func GetUsers(c echo.Context) error {
+	s := repo(userStorage{})
+	response, _ := s.Fetch()
+	return c.JSON(http.StatusOK, response)
 }

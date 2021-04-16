@@ -37,6 +37,7 @@ func main() {
 	})
 
 	e.POST("/registration", user.PostUserRegistration)
+	e.GET("/users", user.GetUsers)
 
 	// e.GET("/books", book.GetBooks)
 	// e.GET("/books/newest", book.GetNewestBooks)

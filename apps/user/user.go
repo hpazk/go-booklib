@@ -1,10 +1,16 @@
 package user
 
-import "time"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 // TODO 1: gorm.Model
 
+// User Entity
 type User struct {
+	gorm.Model
 	Name            string
 	Address         string
 	Photo           string
@@ -38,16 +44,16 @@ type response struct {
 
 func userResponseFormatter(user User, auth_token string) response {
 	formatter := response{
-		// ID:        user.ID,
+		ID:              user.ID,
 		Name:            user.Name,
 		Address:         user.Address,
 		Photo:           user.Photo,
 		Email:           user.Email,
 		EmailVerifiedAt: user.EmailVerifiedAt,
 		AuthToken:       auth_token,
-		// CreatedAt: user.CreatedAt,
-		// UpdatedAt: user.UpdatedAt,
-		// DeletedAt: user.DeletedAt,
+		CreatedAt:       user.CreatedAt,
+		UpdatedAt:       user.UpdatedAt,
+		DeletedAt:       user.DeletedAt,
 	}
 
 	return formatter
