@@ -18,8 +18,8 @@ func main() {
 		return c.JSON(http.StatusOK, helper.M{"message": "success"})
 	})
 
-	e.GET("/books", book.GetBookCatalog)
-	e.GET("/books/newest", book.GetBookCatalog)
+	e.GET("/books", book.GetBooks)
+	e.GET("/books/newest", book.GetNewestBooks)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
