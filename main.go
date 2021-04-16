@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/hpazk/go-booklib/apps/user"
 	"github.com/hpazk/go-booklib/helper"
+	"github.com/hpazk/go-booklib/routes"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -36,11 +37,17 @@ func main() {
 		return c.JSON(http.StatusOK, helper.M{"message": "success"})
 	})
 
-	e.POST("/registration", user.PostUserRegistration)
-	e.GET("/users", user.GetUsers)
+	// TODO development: routes
+	// e.POST("/registration", user.PostUserRegistration)
+	// e.GET("/users", user.GetUsers)
+	// e.GET("/users/:id", user.GetUser)
+	// e.PUT("/users/:id", user.PutUser)
+	// e.DELETE("/users/:id", user.DeleteUser)
+
+	routes.DefineApiRoutes(e)
 
 	// e.GET("/books", book.GetBooks)
 	// e.GET("/books/newest", book.GetNewestBooks)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

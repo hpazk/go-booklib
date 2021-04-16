@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/labstack/echo/v4"
@@ -54,6 +55,41 @@ func PostUserLogin(c echo.Context) error {
 
 func GetUsers(c echo.Context) error {
 	s := repo(userStorage{})
+	if findByEmail := c.QueryParam("email"); findByEmail != "" {
+		s := repo(userStorage{})
+		email := c.QueryParam("email")
+
+		response, _ := s.GetByEmail(email)
+		return c.JSON(http.StatusOK, response)
+	}
 	response, _ := s.Fetch()
+	return c.JSON(http.StatusOK, response)
+}
+
+func GetUser(c echo.Context) error {
+	s := repo(userStorage{})
+	id, _ := strconv.Atoi(c.Param("id"))
+	response, _ := s.GetById(id)
+	return c.JSON(http.StatusOK, response)
+}
+
+// func GetUserByEmail(c echo.Context) error {
+// 	s := repo(userStorage{})
+// 	email := c.QueryParam("name")
+// 	response, _ := s.GetByEmail(email)
+// 	return c.JSON(http.StatusOK, response)
+// }
+
+func PutUser(c echo.Context) error {
+	s := repo(userStorage{})
+	id, _ := strconv.Atoi(c.Param("id"))
+	response, _ := s.Update(id)
+	return c.JSON(http.StatusOK, response)
+}
+
+func DeleteUser(c echo.Context) error {
+	s := repo(userStorage{})
+	id, _ := strconv.Atoi(c.Param("id"))
+	response, _ := s.Delete(id)
 	return c.JSON(http.StatusOK, response)
 }
