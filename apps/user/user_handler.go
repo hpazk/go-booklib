@@ -9,7 +9,7 @@ import (
 )
 
 // TODO 1: payload validator
-// TODO 2: existEmail validatation
+// TODO 2: existEmail validatator
 // TODO 3: createUser service
 // TODO 3: authToken service
 // TODO 4: response formatter
@@ -17,14 +17,22 @@ import (
 
 // TODO 6: error handling and error-response formatter
 
+// TODO 7: emailVerification service
+
 func PostUserRegistration(c echo.Context) error {
 	req := new(request)
 	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, helper.M{"message": "err-badrequest"})
+		response := helper.ResponseFormatter(http.StatusBadRequest, "error", "invalid request", nil)
+
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	if err := c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, helper.M{"message": "err-validation"})
+		errorFormatter := helper.ErrorFormatter(err)
+		errorMessage := helper.M{"errors": errorFormatter}
+		response := helper.ResponseFormatter(http.StatusBadRequest, "error", errorMessage, nil)
+
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	// TODO development: createUser

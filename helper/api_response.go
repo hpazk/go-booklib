@@ -4,9 +4,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// response
-// meta payload
-
 type Response struct {
 	Meta Meta        `json:"meta"`
 	Data interface{} `json:"data"`
