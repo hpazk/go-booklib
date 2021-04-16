@@ -16,4 +16,6 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, helper.M{"message": "success"})
 	})
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
