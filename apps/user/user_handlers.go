@@ -2,7 +2,9 @@ package user
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/hpazk/go-booklib/helper"
@@ -85,6 +87,62 @@ func (h *userHandler) PostUserLogin(c echo.Context) error {
 	userData := userLoginResponseFormatter(user, authToken)
 
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user authenticated", userData)
+
+	return c.JSON(http.StatusOK, response)
+}
+
+// TODO error-handling
+func (h *userHandler) PostUserPhoto(c echo.Context) error {
+
+	// TODO jwt: userId
+	// TODO image-validation
+	id := 1
+	user, err := h.userServices.FetchUserById(id)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusNotFound, "fail", "user doesn't exist", nil)
+		return c.JSON(http.StatusNotFound, response)
+	}
+
+	// Source
+	photo, err := c.FormFile("photo")
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	src, err := photo.Open()
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+	defer src.Close()
+
+	ext := string(photo.Filename[len(photo.Filename)-3:])
+	fmt.Println(ext)
+	photoPath := fmt.Sprintf("public/images/%d-%s.%s", user.ID, user.Name, ext)
+
+	// Destination
+	dst, err := os.Create(photoPath)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+	defer dst.Close()
+
+	// Copy
+	if _, err = io.Copy(dst, src); err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	// Upload
+	_, err = h.userServices.UploadPhoto(user, photoPath)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+
+	response := helper.ResponseFormatter(http.StatusOK, "success", "photo succesfully uploaded", helper.M{"is_uploaded": true})
 
 	return c.JSON(http.StatusOK, response)
 }

@@ -10,6 +10,7 @@ import (
 type UserServices interface {
 	signUp(req *request) (User, error)
 	signIn(req *loginRequest) (User, error)
+	UploadPhoto(user User, fileLocation string) (User, error)
 	FetchUsers() ([]User, error)
 	FetchUserById(id int) (User, error)
 	FetchUserByEmail(email string) (User, error)
@@ -36,6 +37,8 @@ func (s *services) signUp(req *request) (User, error) {
 	// userReg.Role = ""
 	userReg.CreatedAt = time.Now()
 	userReg.UpdatedAt = time.Now()
+
+	// TODO userExist
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -68,6 +71,17 @@ func (s *services) signIn(req *loginRequest) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *services) UploadPhoto(user User, fileLocation string) (User, error) {
+	user.Photo = fileLocation
+
+	editedUser, err := s.repository.Update(user)
+	if err != nil {
+		return user, errors.New("something went wrong")
+	}
+
+	return editedUser, nil
 }
 
 func (s *services) FetchUsers() ([]User, error) {
@@ -105,12 +119,12 @@ func (s *services) UpdateUser(id int, req *updateRequest) (User, error) {
 	userReg.CreatedAt = time.Now()
 	userReg.UpdatedAt = time.Now()
 
-	editUser, err := s.repository.Update(userReg)
+	editedUser, err := s.repository.Update(userReg)
 	if err != nil {
-		return editUser, err
+		return editedUser, err
 	}
 
-	return editUser, nil
+	return editedUser, nil
 }
 
 func (s *services) DeleteUser(id int) error {

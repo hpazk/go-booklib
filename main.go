@@ -33,16 +33,12 @@ func main() {
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
+	// Static folder images
+	e.Static("/", "public")
+
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, helper.M{"message": "success"})
 	})
-
-	// TODO development: routes
-	// e.POST("/registration", user.PostUserRegistration)
-	// e.GET("/users", user.GetUsers)
-	// e.GET("/users/:id", user.GetUser)
-	// e.PUT("/users/:id", user.PutUser)
-	// e.DELETE("/users/:id", user.DeleteUser)
 
 	routes.DefineApiRoutes(e)
 
