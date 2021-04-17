@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/hpazk/go-booklib/auth"
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/labstack/echo/v4"
 )
@@ -25,10 +26,11 @@ import (
 
 type userHandler struct {
 	userServices UserServices
+	authServices auth.AuthServices
 }
 
-func UserHandler(userServices UserServices) *userHandler {
-	return &userHandler{userServices}
+func UserHandler(userServices UserServices, authServices auth.AuthServices) *userHandler {
+	return &userHandler{userServices, authServices}
 }
 
 func (h *userHandler) PostUserRegistration(c echo.Context) error {
@@ -52,7 +54,12 @@ func (h *userHandler) PostUserRegistration(c echo.Context) error {
 	newUser, _ := h.userServices.signUp(req)
 
 	// TODO development: authToken
-	authToken := "12345678"
+	authToken, err := h.authServices.GetAccessToken(newUser.ID, newUser.Role)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "something went wrong", nil)
+
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
 	// TODO development: userData
 	userData := userResponseFormatter(newUser, authToken)
@@ -78,15 +85,20 @@ func (h *userHandler) PostUserLogin(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	user, err := h.userServices.signIn(req)
+	signedInUser, err := h.userServices.signIn(req)
 	if err != nil {
 		response := helper.ResponseFormatter(http.StatusNotFound, "fail", err.Error(), nil)
 		return c.JSON(http.StatusNotFound, response)
 	}
 
 	// TODO auth-token
-	authToken := "123"
-	userData := userLoginResponseFormatter(user, authToken)
+	authToken, err := h.authServices.GetAccessToken(signedInUser.ID, signedInUser.Role)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "something went wrong", nil)
+
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+	userData := userLoginResponseFormatter(signedInUser, authToken)
 
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user authenticated", userData)
 

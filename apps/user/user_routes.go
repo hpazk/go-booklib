@@ -1,11 +1,13 @@
 package user
 
 import (
+	"github.com/hpazk/go-booklib/auth"
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/labstack/echo/v4"
 )
 
-type UserRoutes struct{}
+type UserRoutes struct {
+}
 
 func (r *UserRoutes) Route() []helper.Route {
 	// db := database.GetDbInstance()
@@ -15,8 +17,23 @@ func (r *UserRoutes) Route() []helper.Route {
 	// authService := auth.NewAuthService()
 
 	repos := UserRepository(&UsersStorage{})
-	service := UserService(repos)
-	handler := UserHandler(service)
+	userservice := UserService(repos)
+	authService := auth.AuthService()
+
+	handler := UserHandler(userservice, authService)
+
+	// TODO development: jwt
+	// fmt.Println(authService.GetAccessToken(1, "admin"))
+	// token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3JvbGUiOiJtZW1iZXIifQ.W-1DAL_6sFHNK_RCly2EGELgYbW1KzwBStP2jI8FSDU")
+	// if err != nil {
+	// 	fmt.Println("Error")
+	// }
+
+	// if token.Valid {
+	// 	fmt.Println("Token is Valid")
+	// } else {
+	// 	fmt.Println("Token is Invalid")
+	// }
 
 	// userHandler := NewHandler(userService, authService)
 

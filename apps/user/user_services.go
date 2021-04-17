@@ -35,7 +35,7 @@ func (s *services) signUp(req *request) (User, error) {
 	userReg.Email = req.Email
 	// userReg.EmailVerifiedAt = time.Now()
 	userReg.Password = req.Password
-	// userReg.Role = ""
+	userReg.Role = "member"
 	userReg.CreatedAt = time.Now()
 	userReg.UpdatedAt = time.Now()
 

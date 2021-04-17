@@ -46,10 +46,12 @@ type response struct {
 	Address         string     `json:"address"`
 	Photo           string     `json:"photo"`
 	Email           string     `json:"email"`
+	Role            string     `json:"role"`
 	EmailVerifiedAt time.Time  `json:"email_verified_at"`
 	CreatedAt       time.Time  `json:"created_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
 	DeletedAt       *time.Time `json:"deleted_at"`
+	AuthToken       string     `json:"auth_token"`
 }
 
 func userResponseFormatter(user User, authToken string) response {
@@ -59,10 +61,12 @@ func userResponseFormatter(user User, authToken string) response {
 		Address:         user.Address,
 		Photo:           user.Photo,
 		Email:           user.Email,
+		Role:            user.Role,
 		EmailVerifiedAt: user.EmailVerifiedAt,
 		CreatedAt:       user.CreatedAt,
 		UpdatedAt:       user.UpdatedAt,
 		DeletedAt:       user.DeletedAt,
+		AuthToken:       authToken,
 	}
 
 	return formatter
