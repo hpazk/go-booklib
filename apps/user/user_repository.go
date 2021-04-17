@@ -1,5 +1,7 @@
 package user
 
+import "errors"
+
 type userRepository interface {
 	Store(user User) (User, error)
 	Fetch() ([]User, error)
@@ -51,6 +53,8 @@ func (r *repository) GetByEmail(email string) (User, error) {
 	for _, v := range usersStorage {
 		if v.Email == email {
 			userByEmail = v
+		} else {
+			return v, errors.New("user email not found")
 		}
 	}
 	return userByEmail, nil

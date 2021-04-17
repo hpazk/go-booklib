@@ -27,6 +27,11 @@ func (r *UserRoutes) Route() []helper.Route {
 			Handler: handler.PostUserRegistration,
 		},
 		{
+			Method:  echo.POST,
+			Path:    "/login",
+			Handler: handler.PostUserLogin,
+		},
+		{
 			Method:  echo.GET,
 			Path:    "/users",
 			Handler: handler.GetUsers,

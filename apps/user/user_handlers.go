@@ -9,18 +9,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// TODO 1: payload validator
+// TODO 1: payload validator: OK
 // TODO 2: existEmail validatator
-// TODO 3: createUser service
+// TODO 3: createUser service: OK
 // TODO 3: authToken service
-// TODO 4: response formatter
-// TODO 5: api response formatter
-
-// TODO 6: error handling and error-response formatter
-
+// TODO 4: response formatter: OK
+// TODO 5: api response formatter: OK
+// TODO 6: error handling and error-response formatter: OK
 // TODO 7: emailVerification service
-
-// TODO 8: userHandler
+// TODO 8: userHandler: OK
+// TODO 9: handler login
+// TODO 10: handler logout
 
 type userHandler struct {
 	userServices UserServices
@@ -33,7 +32,7 @@ func UserHandler(userServices UserServices) *userHandler {
 func (h *userHandler) PostUserRegistration(c echo.Context) error {
 	req := new(request)
 	if err := c.Bind(req); err != nil {
-		response := helper.ResponseFormatter(http.StatusBadRequest, "error", "invalid request", nil)
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "invalid request", nil)
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -41,13 +40,11 @@ func (h *userHandler) PostUserRegistration(c echo.Context) error {
 	if err := c.Validate(req); err != nil {
 		errorFormatter := helper.ErrorFormatter(err)
 		errorMessage := helper.M{"errors": errorFormatter}
-		response := helper.ResponseFormatter(http.StatusBadRequest, "error", errorMessage, nil)
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", errorMessage, nil)
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	// TODO development: services
-	// TODO development: createUser
 	newUser, _ := h.userServices.signUp(req)
 
 	// TODO development: authToken
@@ -61,17 +58,52 @@ func (h *userHandler) PostUserRegistration(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func PostUserLogin(c echo.Context) error {
-	return c.JSON(http.StatusOK, helper.M{"message": "user-login"})
+func (h *userHandler) PostUserLogin(c echo.Context) error {
+	req := new(loginRequest)
+	if err := c.Bind(req); err != nil {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "invalid request", nil)
+
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	if err := c.Validate(req); err != nil {
+		errorFormatter := helper.ErrorFormatter(err)
+		errorMessage := helper.M{"errors": errorFormatter}
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", errorMessage, nil)
+
+		return c.JSON(http.StatusBadRequest, response)
+	}
+
+	user, err := h.userServices.signIn(req)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusNotFound, "fail", err.Error(), nil)
+		return c.JSON(http.StatusNotFound, response)
+	}
+
+	// TODO auth-token
+	authToken := "123"
+	userData := userResponseFormatter(user, authToken)
+
+	response := helper.ResponseFormatter(http.StatusOK, "success", "user authenticated", userData)
+
+	return c.JSON(http.StatusOK, response)
 }
 
+// TODO error-handling
 func (h *userHandler) GetUsers(c echo.Context) error {
 	if findByEmail := c.QueryParam("email"); findByEmail != "" {
 		email := c.QueryParam("email")
 
-		response, _ := h.userServices.FetchUserByEmail(email)
-		return c.JSON(http.StatusOK, response)
+		user, err := h.userServices.FetchUserByEmail(email)
+		if err != nil {
+			return c.JSON(http.StatusNotFound, helper.M{"message": err.Error()})
+		} else {
+			response := user
+			return c.JSON(http.StatusOK, response)
+		}
+
 	}
+	// TODO response-formatter
 	response, _ := h.userServices.FetchUsers()
 	return c.JSON(http.StatusOK, response)
 }
@@ -87,15 +119,15 @@ func (h *userHandler) PutUser(c echo.Context) error {
 	req := new(updateRequest)
 
 	if err := c.Bind(req); err != nil {
-		response := helper.ResponseFormatter(http.StatusBadRequest, "error", "invalid request", nil)
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "invalid request", nil)
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	if err := c.Validate(req); err != nil {
 		errorFormatter := helper.ErrorFormatter(err)
-		errorMessage := helper.M{"errors": errorFormatter}
-		response := helper.ResponseFormatter(http.StatusBadRequest, "error", errorMessage, nil)
+		errorMessage := helper.M{"fail": errorFormatter}
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", errorMessage, nil)
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
@@ -107,8 +139,10 @@ func (h *userHandler) PutUser(c echo.Context) error {
 func (h *userHandler) DeleteUser(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.userServices.DeleteUser(id); err != nil {
-		return c.JSON(http.StatusOK, helper.M{"message": err})
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", err, nil)
+		return c.JSON(http.StatusOK, response)
 	}
 	message := fmt.Sprintf("user %d was deleted", id)
-	return c.JSON(http.StatusOK, helper.M{"message": message})
+	response := helper.ResponseFormatter(http.StatusOK, "success", message, nil)
+	return c.JSON(http.StatusOK, response)
 }

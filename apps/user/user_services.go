@@ -9,6 +9,7 @@ import (
 
 type UserServices interface {
 	signUp(req *request) (User, error)
+	signIn(req *loginRequest) (User, error)
 	FetchUsers() ([]User, error)
 	FetchUserById(id int) (User, error)
 	FetchUserByEmail(email string) (User, error)
@@ -51,6 +52,24 @@ func (s *services) signUp(req *request) (User, error) {
 	return newUser, nil
 }
 
+// TODO user-login
+func (s *services) signIn(req *loginRequest) (User, error) {
+	email := req.Email
+	password := req.Password
+
+	user, err := s.repository.GetByEmail(email)
+	if err != nil {
+		return user, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return user, errors.New("invalid password")
+	}
+
+	return user, nil
+}
+
 func (s *services) FetchUsers() ([]User, error) {
 	var users []User
 	users, _ = s.repository.Fetch()
@@ -67,7 +86,10 @@ func (s *services) FetchUserById(id int) (User, error) {
 
 func (s *services) FetchUserByEmail(email string) (User, error) {
 	var user User
-	user, _ = s.repository.GetByEmail(email)
+	user, err := s.repository.GetByEmail(email)
+	if err != nil {
+		return user, err
+	}
 
 	return user, nil
 }
