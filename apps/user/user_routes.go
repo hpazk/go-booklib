@@ -14,33 +14,37 @@ func (r *UserRoutes) Route() []helper.Route {
 	// userService := NewServices(userRepo)
 	// authService := auth.NewAuthService()
 
+	repos := UserRepository(&UsersStorage{})
+	service := UserService(repos)
+	handler := UserHandler(service)
+
 	// userHandler := NewHandler(userService, authService)
 
 	return []helper.Route{
 		{
 			Method:  echo.POST,
 			Path:    "/registration",
-			Handler: PostUserRegistration,
+			Handler: handler.PostUserRegistration,
 		},
 		{
 			Method:  echo.GET,
 			Path:    "/users",
-			Handler: GetUsers,
+			Handler: handler.GetUsers,
 		},
 		{
 			Method:  echo.GET,
 			Path:    "/users/:id",
-			Handler: GetUser,
+			Handler: handler.GetUser,
 		},
 		{
 			Method:  echo.PUT,
 			Path:    "/users/:id",
-			Handler: PutUser,
+			Handler: handler.PutUser,
 		},
 		{
 			Method:  echo.DELETE,
 			Path:    "/users/:id",
-			Handler: DeleteUser,
+			Handler: handler.DeleteUser,
 		},
 	}
 }
