@@ -57,7 +57,7 @@ func (s *services) signIn(req *loginRequest) (User, error) {
 	email := req.Email
 	password := req.Password
 
-	user, err := s.repository.GetByEmail(email)
+	user, err := s.repository.FindByEmail(email)
 	if err != nil {
 		return user, err
 	}
@@ -79,14 +79,14 @@ func (s *services) FetchUsers() ([]User, error) {
 
 func (s *services) FetchUserById(id int) (User, error) {
 	var user User
-	user, _ = s.repository.GetById(id)
+	user, _ = s.repository.FindById(id)
 
 	return user, nil
 }
 
 func (s *services) FetchUserByEmail(email string) (User, error) {
 	var user User
-	user, err := s.repository.GetByEmail(email)
+	user, err := s.repository.FindByEmail(email)
 	if err != nil {
 		return user, err
 	}
@@ -105,7 +105,7 @@ func (s *services) UpdateUser(id int, req *updateRequest) (User, error) {
 	userReg.CreatedAt = time.Now()
 	userReg.UpdatedAt = time.Now()
 
-	editUser, err := s.repository.Update(id, userReg)
+	editUser, err := s.repository.Update(userReg)
 	if err != nil {
 		return editUser, err
 	}
