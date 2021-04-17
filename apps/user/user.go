@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// TODO 1: gorm.Model
+// TODO 1: timestamp store and response
 
 // User Entity
 type User struct {
@@ -47,13 +47,12 @@ type response struct {
 	Photo           string     `json:"photo"`
 	Email           string     `json:"email"`
 	EmailVerifiedAt time.Time  `json:"email_verified_at"`
-	AuthToken       string     `json:"auth_token"`
 	CreatedAt       time.Time  `json:"created_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
 	DeletedAt       *time.Time `json:"deleted_at"`
 }
 
-func userResponseFormatter(user User, auth_token string) response {
+func userResponseFormatter(user User, authToken string) response {
 	formatter := response{
 		ID:              user.ID,
 		Name:            user.Name,
@@ -61,10 +60,31 @@ func userResponseFormatter(user User, auth_token string) response {
 		Photo:           user.Photo,
 		Email:           user.Email,
 		EmailVerifiedAt: user.EmailVerifiedAt,
-		AuthToken:       auth_token,
 		CreatedAt:       user.CreatedAt,
 		UpdatedAt:       user.UpdatedAt,
 		DeletedAt:       user.DeletedAt,
+	}
+
+	return formatter
+}
+
+type loginResponse struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Address   string `json:"address"`
+	Photo     string `json:"photo"`
+	Email     string `json:"email"`
+	AuthToken string `json:"auth_token"`
+}
+
+func userLoginResponseFormatter(user User, authToken string) loginResponse {
+	formatter := loginResponse{
+		ID:        user.ID,
+		Name:      user.Name,
+		Address:   user.Address,
+		Photo:     user.Photo,
+		Email:     user.Email,
+		AuthToken: authToken,
 	}
 
 	return formatter

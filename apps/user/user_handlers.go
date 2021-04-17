@@ -82,7 +82,7 @@ func (h *userHandler) PostUserLogin(c echo.Context) error {
 
 	// TODO auth-token
 	authToken := "123"
-	userData := userResponseFormatter(user, authToken)
+	userData := userLoginResponseFormatter(user, authToken)
 
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user authenticated", userData)
 
