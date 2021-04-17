@@ -12,10 +12,10 @@ type UserServices interface {
 	signIn(req *loginRequest) (User, error)
 	UploadPhoto(user User, fileLocation string) (User, error)
 	FetchUsers() ([]User, error)
-	FetchUserById(id int) (User, error)
+	FetchUserById(id uint) (User, error)
 	FetchUserByEmail(email string) (User, error)
-	UpdateUser(id int, req *updateRequest) (User, error)
-	DeleteUser(id int) error
+	UpdateUser(id uint, req *updateRequest) (User, error)
+	DeleteUser(id uint) error
 	CheckExistEmail(email string) bool
 }
 
@@ -77,17 +77,18 @@ func (s *services) UploadPhoto(user User, fileLocation string) (User, error) {
 
 	editedUser, err := s.repository.Update(user)
 	if err != nil {
-		return user, errors.New("something went wrong")
+		return user, err
 	}
 
 	return editedUser, nil
 }
 
-// TODO check-meail-exist
+// TODO check-mail-exist
 func (s *services) CheckExistEmail(email string) bool {
 	return false
 }
 
+// TODO error-handling
 func (s *services) FetchUsers() ([]User, error) {
 	var users []User
 	users, _ = s.repository.Fetch()
@@ -95,9 +96,13 @@ func (s *services) FetchUsers() ([]User, error) {
 	return users, nil
 }
 
-func (s *services) FetchUserById(id int) (User, error) {
+// TODO error-handling
+func (s *services) FetchUserById(id uint) (User, error) {
 	var user User
-	user, _ = s.repository.FindById(id)
+	user, err := s.repository.FindById(id)
+	if err != nil {
+		return user, err
+	}
 
 	return user, nil
 }
@@ -112,9 +117,9 @@ func (s *services) FetchUserByEmail(email string) (User, error) {
 	return user, nil
 }
 
-func (s *services) UpdateUser(id int, req *updateRequest) (User, error) {
+func (s *services) UpdateUser(id uint, req *updateRequest) (User, error) {
 	userReg := User{}
-	userReg.ID = uint(id)
+	userReg.ID = id
 	userReg.Name = req.Name
 	userReg.Address = req.Address
 	// userReg.Photo = ""
@@ -131,9 +136,9 @@ func (s *services) UpdateUser(id int, req *updateRequest) (User, error) {
 	return editedUser, nil
 }
 
-func (s *services) DeleteUser(id int) error {
+func (s *services) DeleteUser(id uint) error {
 	if err := s.repository.Delete(id); err != nil {
-		return errors.New("something went wrong")
+		return err
 	}
 
 	return nil

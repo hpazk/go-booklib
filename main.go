@@ -31,6 +31,14 @@ func main() {
 		Format: "method=${method}, uri=${uri}, status=${status}\n",
 	}))
 
+	// e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+	// 	SigningKey:  []byte(os.Getenv("JWT_SECRET_KEY")),
+	// 	ContextKey:  "user",
+	// 	TokenLookup: "header:" + echo.HeaderAuthorization,
+	// 	AuthScheme:  "Bearer",
+	// 	Claims:      jwt.MapClaims{},
+	// }))
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	// Static folder images

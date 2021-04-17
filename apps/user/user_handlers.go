@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/hpazk/go-booklib/auth"
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/labstack/echo/v4"
@@ -109,8 +110,12 @@ func (h *userHandler) PostUserLogin(c echo.Context) error {
 func (h *userHandler) PostUserPhoto(c echo.Context) error {
 
 	// TODO jwt: userId
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+	id := uint(claims["user_id"].(float64))
+	// role := claims["user_role"]
 	// TODO image-validation
-	id := 1
+
 	user, err := h.userServices.FetchUserById(id)
 	if err != nil {
 		response := helper.ResponseFormatter(http.StatusNotFound, "fail", "user doesn't exist", nil)
@@ -133,7 +138,8 @@ func (h *userHandler) PostUserPhoto(c echo.Context) error {
 
 	ext := string(photo.Filename[len(photo.Filename)-3:])
 
-	photoPath := fmt.Sprintf("public/images/%d-%s.%s", user.ID, user.Name, ext)
+	// TODO file-name
+	photoPath := fmt.Sprintf("public/images/%d-%s.%s", id, user.Name, ext)
 
 	// Destination
 	dst, err := os.Create(photoPath)
@@ -173,8 +179,12 @@ func (h *userHandler) GetUsers(c echo.Context) error {
 			response := user
 			return c.JSON(http.StatusOK, response)
 		}
-
 	}
+	userToken := c.Get("user").(*jwt.Token)
+	claims := userToken.Claims.(jwt.MapClaims)
+	id := claims["user_id"]
+	role := claims["user_role"]
+	fmt.Println(id, role)
 	// TODO response-formatter
 	response, _ := h.userServices.FetchUsers()
 	return c.JSON(http.StatusOK, response)
@@ -182,7 +192,7 @@ func (h *userHandler) GetUsers(c echo.Context) error {
 
 func (h *userHandler) GetUser(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	response, _ := h.userServices.FetchUserById(id)
+	response, _ := h.userServices.FetchUserById(uint(id))
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -197,6 +207,7 @@ func (h *userHandler) PutUser(c echo.Context) error {
 	}
 
 	if err := c.Validate(req); err != nil {
+		// TODO error-formater -> error-request-formatter
 		errorFormatter := helper.ErrorFormatter(err)
 		errorMessage := helper.M{"fail": errorFormatter}
 		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", errorMessage, nil)
@@ -204,13 +215,13 @@ func (h *userHandler) PutUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	response, _ := h.userServices.UpdateUser(id, req)
+	response, _ := h.userServices.UpdateUser(uint(id), req)
 	return c.JSON(http.StatusOK, response)
 }
 
 func (h *userHandler) DeleteUser(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	if err := h.userServices.DeleteUser(id); err != nil {
+	if err := h.userServices.DeleteUser(uint(id)); err != nil {
 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", err, nil)
 		return c.JSON(http.StatusOK, response)
 	}

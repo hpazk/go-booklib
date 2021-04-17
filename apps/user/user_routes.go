@@ -22,9 +22,10 @@ func (r *UserRoutes) Route() []helper.Route {
 
 	handler := UserHandler(userservice, authService)
 
-	// TODO development: jwt
+	// TODO jwt: OK
+	// TODO token-validation
 	// fmt.Println(authService.GetAccessToken(1, "admin"))
-	// token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3JvbGUiOiJtZW1iZXIifQ.W-1DAL_6sFHNK_RCly2EGELgYbW1KzwBStP2jI8FSDU")
+	// token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6Im1lbWJlciIsImV4cCI6MTYxODY4OTQwMywiaWF0IjoxNjE4Njc4NjAzfQ.FSRmtEvBspQisJen2hk0MvPtVKEpWUQpZBvwHoKe8ow")
 	// if err != nil {
 	// 	fmt.Println("Error")
 	// }
@@ -49,14 +50,16 @@ func (r *UserRoutes) Route() []helper.Route {
 			Handler: handler.PostUserLogin,
 		},
 		{
-			Method:  echo.POST,
-			Path:    "/user/upload/photo",
-			Handler: handler.PostUserPhoto,
+			Method:     echo.POST,
+			Path:       "/user/upload/photo",
+			Handler:    handler.PostUserPhoto,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 		{
-			Method:  echo.GET,
-			Path:    "/users",
-			Handler: handler.GetUsers,
+			Method:     echo.GET,
+			Path:       "/users",
+			Handler:    handler.GetUsers,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 		{
 			Method:  echo.GET,
