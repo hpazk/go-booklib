@@ -16,6 +16,7 @@ type UserServices interface {
 	FetchUserByEmail(email string) (User, error)
 	UpdateUser(id int, req *updateRequest) (User, error)
 	DeleteUser(id int) error
+	CheckExistEmail(email string) bool
 }
 
 type services struct {
@@ -37,8 +38,6 @@ func (s *services) signUp(req *request) (User, error) {
 	// userReg.Role = ""
 	userReg.CreatedAt = time.Now()
 	userReg.UpdatedAt = time.Now()
-
-	// TODO userExist
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -82,6 +81,11 @@ func (s *services) UploadPhoto(user User, fileLocation string) (User, error) {
 	}
 
 	return editedUser, nil
+}
+
+// TODO check-meail-exist
+func (s *services) CheckExistEmail(email string) bool {
+	return false
 }
 
 func (s *services) FetchUsers() ([]User, error) {

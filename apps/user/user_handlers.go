@@ -47,6 +47,8 @@ func (h *userHandler) PostUserRegistration(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
+	// TODO services:check-email-exist
+
 	newUser, _ := h.userServices.signUp(req)
 
 	// TODO development: authToken
@@ -55,11 +57,11 @@ func (h *userHandler) PostUserRegistration(c echo.Context) error {
 	// TODO development: userData
 	userData := userResponseFormatter(newUser, authToken)
 
-	// TODO development: ApiResponseFormatter
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user registered", userData)
 	return c.JSON(http.StatusOK, response)
 }
 
+// TODO check exist-email
 func (h *userHandler) PostUserLogin(c echo.Context) error {
 	req := new(loginRequest)
 	if err := c.Bind(req); err != nil {
@@ -118,7 +120,7 @@ func (h *userHandler) PostUserPhoto(c echo.Context) error {
 	defer src.Close()
 
 	ext := string(photo.Filename[len(photo.Filename)-3:])
-	fmt.Println(ext)
+
 	photoPath := fmt.Sprintf("public/images/%d-%s.%s", user.ID, user.Name, ext)
 
 	// Destination
