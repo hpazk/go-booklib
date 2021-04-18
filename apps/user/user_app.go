@@ -41,21 +41,21 @@ func (r *UserApp) Route() []helper.Route {
 			Path:    "/registration",
 			Handler: handler.PostUserRegistration,
 		},
+		{
+			Method:  echo.POST,
+			Path:    "/login",
+			Handler: handler.PostUserLogin,
+		},
+		{
+			Method:     echo.POST,
+			Path:       "/user/upload/photo",
+			Handler:    handler.PostUserPhoto,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
+		},
 		// {
-		// 	Method:  echo.POST,
-		// 	Path:    "/login",
-		// 	Handler: handler.PostUserLogin,
-		// },
-		// {
-		// 	Method:     echo.POST,
-		// 	Path:       "/user/upload/photo",
-		// 	Handler:    handler.PostUserPhoto,
-		// 	Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
-		// },
-		// {
-		// 	Method:     echo.GET,
-		// 	Path:       "/users",
-		// 	Handler:    handler.GetUsers,
+		// 	Method:  echo.GET,
+		// 	Path:    "/users",
+		// 	Handler: handler.GetUsers,
 		// 	Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		// },
 		// {

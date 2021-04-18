@@ -7,10 +7,10 @@ import (
 type userRepository interface {
 	Store(user User) (User, error)
 	// Fetch() ([]User, error)
-	// Update(user User) (User, error)
+	Update(user User) (User, error)
 	// Delete(id uint) error
-	// FindById(id uint) (User, error)
-	// FindByEmail(email string) (User, error)
+	FindById(id uint) (User, error)
+	FindByEmail(email string) (User, error)
 }
 
 type repository struct {
@@ -32,51 +32,49 @@ func (r *repository) Store(user User) (User, error) {
 }
 
 // // Get All Users
-// func (r *repository) Fetch() ([]User, error) {
-// 	var users []User
-// 	for _, v := range usersStorage {
-// 		users = append(users, v)
-// 	}
+func (r *repository) Fetch() ([]User, error) {
+	var users []User
+	err := r.db.Find(&users).Error
+	if err != nil {
+		return users, err
+	}
 
-// 	return users, nil
-// }
+	return users, nil
+}
 
-// // Get User by Id
-// func (r *repository) FindById(id uint) (User, error) {
-// 	// user := User{}
-// 	// if len(usersStorage) != int(id) {
-// 	// 	return user, errors.New("user doesn't exist")
-// 	// }
+// Get User by Id
+func (r *repository) FindById(id uint) (User, error) {
+	var user User
 
-// 	// for _, v := range usersStorage {
-// 	// 	if usersStorage[id-1] == v {
-// 	// 		user = v
-// 	// 		return user, errors.New("user doesn't exist")
-// 	// 	}
-// 	// 	user = usersStorage[id-1]
-// 	// }
-// 	return usersStorage[id-1], nil
-// }
+	err := r.db.First(&user, "id = ?", id).Error
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
 
 // // Get User By Email
-// func (r *repository) FindByEmail(email string) (User, error) {
-// 	userByEmail := User{}
+func (r *repository) FindByEmail(email string) (User, error) {
+	var user User
 
-// 	for _, v := range usersStorage {
-// 		if v.Email == email {
-// 			userByEmail = v
-// 		} else {
-// 			return v, errors.New("user email not found")
-// 		}
-// 	}
-// 	return userByEmail, nil
-// }
+	err := r.db.First(&user, "email = ?", email).Error
+	if err != nil {
+		return user, err
+	}
 
-// // Update user
-// func (r *repository) Update(user User) (User, error) {
-// 	usersStorage[user.ID-1] = user
-// 	return usersStorage[user.ID-1], nil
-// }
+	return user, nil
+}
+
+// Update user
+func (r *repository) Update(user User) (User, error) {
+	err := r.db.Save(&user).Error
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
 
 // // Delete User
 // func (r *repository) Delete(id uint) error {

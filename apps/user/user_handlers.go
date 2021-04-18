@@ -1,8 +1,12 @@
 package user
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/hpazk/go-booklib/auth"
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/labstack/echo/v4"
@@ -31,12 +35,15 @@ func UserHandler(userServices UserServices, authServices auth.AuthServices) *use
 
 func (h *userHandler) PostUserRegistration(c echo.Context) error {
 	req := new(request)
+
+	// Check request
 	if err := c.Bind(req); err != nil {
 		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "invalid request", nil)
 
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
+	// Validate request
 	if err := c.Validate(req); err != nil {
 		errorFormatter := helper.ErrorFormatter(err)
 		errorMessage := helper.M{"errors": errorFormatter}
@@ -45,11 +52,20 @@ func (h *userHandler) PostUserRegistration(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	// TODO services:check-email-exist
+	// Check email exist
+	if existEmail := h.userServices.CheckExistEmail(req.Email); existEmail {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "email is already registered", nil)
+		return c.JSON(http.StatusBadRequest, response)
+	}
 
-	newUser, _ := h.userServices.signUp(req)
+	// SignUp service
+	newUser, err := h.userServices.signUp(req)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "email is already registered", nil)
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
-	// TODO development: authToken
+	// Get access token
 	authToken, err := h.authServices.GetAccessToken(newUser.ID, newUser.Role)
 	if err != nil {
 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "something went wrong", nil)
@@ -57,136 +73,146 @@ func (h *userHandler) PostUserRegistration(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, response)
 	}
 
-	// TODO development: userData
+	// Format data
 	userData := userResponseFormatter(newUser, authToken)
 
+	// Passed response
 	response := helper.ResponseFormatter(http.StatusOK, "success", "user registered", userData)
 	return c.JSON(http.StatusOK, response)
 }
 
-// // TODO check exist-email
-// func (h *userHandler) PostUserLogin(c echo.Context) error {
-// 	req := new(loginRequest)
-// 	if err := c.Bind(req); err != nil {
-// 		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "invalid request", nil)
+// TODO check exist-email
+func (h *userHandler) PostUserLogin(c echo.Context) error {
+	req := new(loginRequest)
 
-// 		return c.JSON(http.StatusBadRequest, response)
-// 	}
+	// Check request
+	if err := c.Bind(req); err != nil {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "invalid request", nil)
 
-// 	if err := c.Validate(req); err != nil {
-// 		errorFormatter := helper.ErrorFormatter(err)
-// 		errorMessage := helper.M{"errors": errorFormatter}
-// 		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", errorMessage, nil)
+		return c.JSON(http.StatusBadRequest, response)
+	}
 
-// 		return c.JSON(http.StatusBadRequest, response)
-// 	}
+	// Validate request
+	if err := c.Validate(req); err != nil {
+		errorFormatter := helper.ErrorFormatter(err)
+		errorMessage := helper.M{"errors": errorFormatter}
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", errorMessage, nil)
 
-// 	signedInUser, err := h.userServices.signIn(req)
-// 	if err != nil {
-// 		response := helper.ResponseFormatter(http.StatusNotFound, "fail", err.Error(), nil)
-// 		return c.JSON(http.StatusNotFound, response)
-// 	}
+		return c.JSON(http.StatusBadRequest, response)
+	}
 
-// 	// TODO auth-token
-// 	authToken, err := h.authServices.GetAccessToken(signedInUser.ID, signedInUser.Role)
-// 	if err != nil {
-// 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "something went wrong", nil)
+	signedInUser, err := h.userServices.signIn(req)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", err.Error(), nil)
+		return c.JSON(http.StatusBadRequest, response)
+	}
 
-// 		return c.JSON(http.StatusInternalServerError, response)
-// 	}
-// 	userData := userLoginResponseFormatter(signedInUser, authToken)
+	// TODO auth-token
+	authToken, err := h.authServices.GetAccessToken(signedInUser.ID, signedInUser.Role)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "something went wrong", nil)
 
-// 	response := helper.ResponseFormatter(http.StatusOK, "success", "user authenticated", userData)
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+	userData := userLoginResponseFormatter(signedInUser, authToken)
 
-// 	return c.JSON(http.StatusOK, response)
-// }
+	response := helper.ResponseFormatter(http.StatusOK, "success", "user authenticated", userData)
 
-// // TODO error-handling
-// func (h *userHandler) PostUserPhoto(c echo.Context) error {
+	return c.JSON(http.StatusOK, response)
+}
 
-// 	// TODO jwt: userId
-// 	accessToken := c.Get("user").(*jwt.Token)
-// 	claims := accessToken.Claims.(jwt.MapClaims)
-// 	id := uint(claims["user_id"].(float64))
-// 	// role := claims["user_role"]
-// 	// TODO image-validation
+// Upload Photo Handler
+func (h *userHandler) PostUserPhoto(c echo.Context) error {
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
+	id := uint(claims["user_id"].(float64))
+	// role := claims["user_role"]
 
-// 	user, err := h.userServices.FetchUserById(id)
-// 	if err != nil {
-// 		response := helper.ResponseFormatter(http.StatusNotFound, "fail", "user doesn't exist", nil)
-// 		return c.JSON(http.StatusNotFound, response)
-// 	}
+	// TODO image-validation
 
-// 	// Source
-// 	photo, err := c.FormFile("photo")
-// 	if err != nil {
-// 		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "file upload failed", helper.M{"is_uploaded": false})
-// 		return c.JSON(http.StatusBadRequest, response)
-// 	}
+	user, err := h.userServices.FetchUserById(id)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusNotFound, "fail", "user doesn't exist", nil)
+		return c.JSON(http.StatusNotFound, response)
+	}
 
-// 	src, err := photo.Open()
-// 	if err != nil {
-// 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
-// 		return c.JSON(http.StatusInternalServerError, response)
-// 	}
-// 	defer src.Close()
+	// Source
+	photo, err := c.FormFile("photo")
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusBadRequest, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusBadRequest, response)
+	}
 
-// 	ext := string(photo.Filename[len(photo.Filename)-3:])
+	src, err := photo.Open()
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+	defer src.Close()
 
-// 	// TODO file-name
-// 	photoPath := fmt.Sprintf("public/images/%d-%s.%s", id, user.Name, ext)
+	ext := string(photo.Filename[len(photo.Filename)-3:])
 
-// 	// Destination
-// 	dst, err := os.Create(photoPath)
-// 	if err != nil {
-// 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
-// 		return c.JSON(http.StatusInternalServerError, response)
-// 	}
-// 	defer dst.Close()
+	// TODO file-name
+	photoPath := fmt.Sprintf("public/images/%d-%s.%s", id, user.Name, ext)
 
-// 	// Copy
-// 	if _, err = io.Copy(dst, src); err != nil {
-// 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
-// 		return c.JSON(http.StatusInternalServerError, response)
-// 	}
+	// Destination
+	dst, err := os.Create(photoPath)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
+	defer dst.Close()
 
-// 	// Upload
-// 	_, err = h.userServices.UploadPhoto(user, photoPath)
-// 	if err != nil {
-// 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
-// 		return c.JSON(http.StatusInternalServerError, response)
-// 	}
+	// Copy
+	if _, err = io.Copy(dst, src); err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
-// 	response := helper.ResponseFormatter(http.StatusOK, "success", "photo succesfully uploaded", helper.M{"is_uploaded": true})
+	// Upload
+	_, err = h.userServices.UploadPhoto(user, photoPath)
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", "file upload failed", helper.M{"is_uploaded": false})
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
-// 	return c.JSON(http.StatusOK, response)
-// }
+	response := helper.ResponseFormatter(http.StatusOK, "success", "photo succesfully uploaded", helper.M{"is_uploaded": true})
+
+	return c.JSON(http.StatusOK, response)
+}
 
 // // TODO error-handling
 // func (h *userHandler) GetUsers(c echo.Context) error {
-// 	accessToken := c.Get("user").(*jwt.Token)
-// 	claims := accessToken.Claims.(jwt.MapClaims)
-// 	role := claims["user_role"]
+// 	// accessToken := c.Get("user").(*jwt.Token)
+// 	// claims := accessToken.Claims.(jwt.MapClaims)
+// 	// role := claims["user_role"]
 
-// 	if role != "admin" {
-// 		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
-// 		return c.JSON(http.StatusUnauthorized, response)
+// 	// if role != "admin" {
+// 	// 	response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
+// 	// 	return c.JSON(http.StatusUnauthorized, response)
+// 	// }
+
+// 	// if findByEmail := c.QueryParam("email"); findByEmail != "" {
+// 	// 	email := c.QueryParam("email")
+
+// 	// 	user, err := h.userServices.FetchUserByEmail(email)
+// 	// 	if err != nil {
+// 	// 		return c.JSON(http.StatusNotFound, helper.M{"message": err.Error()})
+// 	// 	} else {
+// 	// 		response := user
+// 	// 		return c.JSON(http.StatusOK, response)
+// 	// 	}
+// 	// }
+
+// 	users, err := h.userServices.FetchUsers()
+// 	if err != nil {
+// 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", err.Error(), nil)
+// 		return c.JSON(http.StatusInternalServerError, response)
 // 	}
 
-// 	if findByEmail := c.QueryParam("email"); findByEmail != "" {
-// 		email := c.QueryParam("email")
+// 	usersData := userResponseFormatter(users)
 
-// 		user, err := h.userServices.FetchUserByEmail(email)
-// 		if err != nil {
-// 			return c.JSON(http.StatusNotFound, helper.M{"message": err.Error()})
-// 		} else {
-// 			response := user
-// 			return c.JSON(http.StatusOK, response)
-// 		}
-// 	}
-
-// 	// TODO response-formatter
-// 	response, _ := h.userServices.FetchUsers()
+// 	response := helper.ResponseFormatter(http.StatusOK, "success", "all user successfully fetched", usersData)
 // 	return c.JSON(http.StatusOK, response)
 // }
 

@@ -28,10 +28,10 @@ type request struct {
 	Password string `json:"password" validate:"required"`
 }
 
-// type loginRequest struct {
-// 	Email    string `json:"email" validate:"required,email"`
-// 	Password string `json:"password" validate:"required"`
-// }
+type loginRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
 
 // type updateRequest struct {
 // 	Name    string `json:"name" validate:"required"`
@@ -72,24 +72,24 @@ func userResponseFormatter(user User, authToken string) response {
 	return formatter
 }
 
-// type loginResponse struct {
-// 	ID        uint   `json:"id"`
-// 	Name      string `json:"name"`
-// 	Address   string `json:"address"`
-// 	Photo     string `json:"photo"`
-// 	Email     string `json:"email"`
-// 	AuthToken string `json:"auth_token"`
-// }
+type loginResponse struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Address   string `json:"address"`
+	Photo     string `json:"photo"`
+	Email     string `json:"email"`
+	AuthToken string `json:"auth_token"`
+}
 
-// func userLoginResponseFormatter(user User, authToken string) loginResponse {
-// 	formatter := loginResponse{
-// 		ID:        user.ID,
-// 		Name:      user.Name,
-// 		Address:   user.Address,
-// 		Photo:     user.Photo,
-// 		Email:     user.Email,
-// 		AuthToken: authToken,
-// 	}
+func userLoginResponseFormatter(user User, authToken string) loginResponse {
+	formatter := loginResponse{
+		ID:        user.ID,
+		Name:      user.Name,
+		Address:   user.Address,
+		Photo:     user.Photo,
+		Email:     user.Email,
+		AuthToken: authToken,
+	}
 
-// 	return formatter
-// }
+	return formatter
+}
