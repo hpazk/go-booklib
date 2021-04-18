@@ -30,5 +30,14 @@ func GetMigrations(db *gorm.DB) *gormigrate.Gormigrate {
 			// 	return nil
 			// },
 		},
+		{
+			ID: "2021041819",
+			Migrate: func(tx *gorm.DB) error {
+				if err := tx.AutoMigrate(&book.Book{}).Error; err != nil {
+					return err
+				}
+				return nil
+			},
+		},
 	})
 }

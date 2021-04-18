@@ -22,6 +22,8 @@ func (h *bookHandler) PostBook(c echo.Context) error {
 	claims := accessToken.Claims.(jwt.MapClaims)
 	role := claims["user_role"]
 
+	fmt.Println(role)
+
 	if role != "admin" {
 		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
 		return c.JSON(http.StatusUnauthorized, response)

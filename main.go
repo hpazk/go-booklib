@@ -7,24 +7,15 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/hpazk/go-booklib/apps"
 	"github.com/hpazk/go-booklib/helper"
-	"github.com/hpazk/go-booklib/routes"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
-
-type CustomValidator struct {
-	validator *validator.Validate
-}
-
-func (cv *CustomValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
-}
 
 func main() {
 	e := echo.New()
 
 	// Custom Validator
-	e.Validator = &CustomValidator{validator: validator.New()}
+	e.Validator = &helper.CustomValidator{Validator: validator.New()}
 
 	// Logger
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -42,9 +33,8 @@ func main() {
 		return c.JSON(http.StatusOK, helper.M{"message": "success"})
 	})
 
-	apps.AppInit()
-	// Routes
-	routes.DefineApiRoutes(e)
+	// App initialization
+	apps.AppInit(e)
 
 	// Run server
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))

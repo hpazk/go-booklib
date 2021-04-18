@@ -6,9 +6,12 @@ import (
 	"github.com/hpazk/go-booklib/apps/book"
 	"github.com/hpazk/go-booklib/apps/user"
 	"github.com/hpazk/go-booklib/database"
+	"github.com/hpazk/go-booklib/helper"
+	"github.com/hpazk/go-booklib/routes"
+	"github.com/labstack/echo/v4"
 )
 
-func AppInit() {
+func AppInit(e *echo.Echo) {
 	// Database
 	db := database.GetDbInstance()
 	dbMigration := database.GetMigrations(db)
@@ -20,8 +23,16 @@ func AppInit() {
 	}
 
 	// Apps
-	user := user.UserInit(db)
-	book := book.BookInit(db)
-	user.InitApp()
-	book.InitApp()
+	userApp := user.UserInit(db)
+	bookApp := book.BookInit(db)
+	userApp.InitApp()
+	bookApp.InitApp()
+
+	// Route App Handler
+	handlers := []helper.Handler{
+		&user.UserApp{},
+		&book.BookApp{},
+	}
+
+	routes.DefineApiRoutes(e, handlers)
 }
