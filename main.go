@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/hpazk/go-booklib/apps"
 	"github.com/hpazk/go-booklib/database"
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/hpazk/go-booklib/routes"
@@ -47,10 +49,12 @@ func main() {
 	dbMigration := database.GetMigrations(db)
 	err := dbMigration.Migrate()
 	if err == nil {
-		print("Migrations did run successfully")
+		fmt.Println("Migrations did run successfully")
 	} else {
-		print("migrations failed.", err)
+		fmt.Println("migrations failed.", err)
 	}
+
+	apps.AppInit(db)
 	// Routes
 	routes.DefineApiRoutes(e)
 
