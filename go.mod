@@ -11,5 +11,6 @@ require (
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	golang.org/x/sys v0.0.0-20210415045647-66c3f260301c // indirect
+	gopkg.in/gormigrate.v1 v1.6.0
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
