@@ -1,12 +1,15 @@
 package book
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 )
 
 type bookRepository interface {
 	Store(bokk Book) (Book, error)
-	// Fetch() ([]Book, error)
+	Fetch() ([]Book, error)
+	FetchByNewest() ([]Book, error)
 	// Update(book Book) (Book, error)
 	// Delete(id uint) error
 	// FindById(id uint) (Book, error)
@@ -34,6 +37,16 @@ func (r *repository) Store(user Book) (Book, error) {
 func (r *repository) Fetch() ([]Book, error) {
 	var books []Book
 	err := r.db.Find(&books).Error
+	if err != nil {
+		return books, err
+	}
+
+	return books, nil
+}
+
+func (r *repository) FetchByNewest() ([]Book, error) {
+	var books []Book
+	err := r.db.Where("year >= ?", time.Now().Year()-2).Find(&books).Error
 	if err != nil {
 		return books, err
 	}

@@ -1,9 +1,13 @@
 package book
 
-import "time"
+import (
+	"time"
+)
 
 type BookServices interface {
 	AddBook(req *request) (Book, error)
+	FetchBooks() ([]Book, error)
+	FetchNewestBooks() ([]Book, error)
 }
 
 type services struct {
@@ -32,4 +36,26 @@ func (s *services) AddBook(req *request) (Book, error) {
 	}
 
 	return newBook, nil
+}
+
+func (s *services) FetchBooks() ([]Book, error) {
+	var books []Book
+
+	books, err := s.repository.Fetch()
+	if err != nil {
+		return books, err
+	}
+
+	return books, nil
+}
+
+func (s *services) FetchNewestBooks() ([]Book, error) {
+	var books []Book
+
+	books, err := s.repository.FetchByNewest()
+	if err != nil {
+		return books, err
+	}
+
+	return books, nil
 }

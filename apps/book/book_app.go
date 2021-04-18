@@ -32,5 +32,15 @@ func (r *BookApp) Route() []helper.Route {
 			Handler:    handler.PostBook,
 			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
+		{
+			Method:  echo.GET,
+			Path:    "/books",
+			Handler: handler.GetBooks,
+		},
+		{
+			Method:  echo.GET,
+			Path:    "/books/newest",
+			Handler: handler.GetNewestBooks,
+		},
 	}
 }

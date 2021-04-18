@@ -57,7 +57,7 @@ func (h *bookHandler) PostBook(c echo.Context) error {
 	bookData := bookResponseFormatter(newBook)
 
 	// Passed response
-	response := helper.ResponseFormatter(http.StatusOK, "success", "user registered", bookData)
+	response := helper.ResponseFormatter(http.StatusOK, "success", "book stored", bookData)
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -69,19 +69,23 @@ func GetBook(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.M{"message": "book-newest"})
 }
 
-func GetBooks(c echo.Context) error {
+func (h *bookHandler) GetBooks(c echo.Context) error {
 	// TODO 1: get books
-	// TODO 1: get books by category
+	// TODO 2: get books by category
 	category := c.QueryParam("category")
 	fmt.Println(category)
 
-	return c.JSON(http.StatusOK, helper.M{"message": "book-catalog"})
+	books, _ := h.bookServices.FetchBooks()
+
+	return c.JSON(http.StatusOK, books)
 }
 
-func GetNewestBooks(c echo.Context) error {
+func (h *bookHandler) GetNewestBooks(c echo.Context) error {
 	// TODO 2: get books by newest year
 
-	return c.JSON(http.StatusOK, helper.M{"message": "book-newest"})
+	books, _ := h.bookServices.FetchNewestBooks()
+
+	return c.JSON(http.StatusOK, books)
 }
 
 func DeleteBook(c echo.Context) error {
