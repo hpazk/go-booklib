@@ -12,14 +12,14 @@ type Book struct {
 	Description string
 	Author      string
 	Year        int
-	IdCategory  int
+	CategoryId  int
 	Stock       int
 	Status      string
 }
 
 type Category struct {
 	gorm.Model
-	Name string `json:"name"`
+	Name string
 }
 
 // TODO book-category relation
@@ -29,7 +29,7 @@ type request struct {
 	Description string `json:"description" validate:"required"`
 	Author      string `json:"author" validate:"required"`
 	Year        int    `json:"year" validate:"required"`
-	IdCategory  int    `json:"id_category" validate:"required"`
+	CategoryId  int    `json:"category_id" validate:"required"`
 	Stock       int    `json:"stock" validate:"required"`
 	Status      string `json:"status" validate:"required"`
 }
@@ -40,7 +40,7 @@ type response struct {
 	Description     string     `json:"description" validate:"required"`
 	Author          string     `json:"author" validate:"required"`
 	Year            int        `json:"year" validate:"required"`
-	IdCategory      int        `json:"id_category" validate:"required"`
+	CategoryId      int        `json:"category_id" validate:"required"`
 	Stock           int        `json:"stock" validate:"required"`
 	Status          string     `json:"status" validate:"required"`
 	EmailVerifiedAt time.Time  `json:"email_verified_at"`

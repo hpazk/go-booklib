@@ -1,6 +1,7 @@
 package book
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -9,7 +10,9 @@ import (
 type bookRepository interface {
 	Store(bokk Book) (Book, error)
 	Fetch() ([]Book, error)
-	FetchByNewest() ([]Book, error)
+	FetchByCategory(categoryId uint) ([]Book, error)
+	FindCategory(categoryName string) (Category, error)
+	FindByNewest() ([]Book, error)
 	// Update(book Book) (Book, error)
 	// Delete(id uint) error
 	// FindById(id uint) (Book, error)
@@ -44,9 +47,31 @@ func (r *repository) Fetch() ([]Book, error) {
 	return books, nil
 }
 
-func (r *repository) FetchByNewest() ([]Book, error) {
+func (r *repository) FindCategory(categoryName string) (Category, error) {
+	var category Category
+	err := r.db.Where("name = ?", categoryName).First(&category).Error
+	if err != nil {
+		return category, err
+	}
+
+	fmt.Println(category)
+
+	return category, nil
+}
+
+func (r *repository) FindByNewest() ([]Book, error) {
 	var books []Book
 	err := r.db.Where("year >= ?", time.Now().Year()-2).Find(&books).Error
+	if err != nil {
+		return books, err
+	}
+
+	return books, nil
+}
+
+func (r *repository) FetchByCategory(categoryId uint) ([]Book, error) {
+	var books []Book
+	err := r.db.Where("category_id = ?", categoryId).Find(&books).Error
 	if err != nil {
 		return books, err
 	}

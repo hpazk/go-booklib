@@ -1,13 +1,16 @@
 package book
 
 import (
+	"fmt"
 	"time"
 )
 
 type BookServices interface {
 	AddBook(req *request) (Book, error)
 	FetchBooks() ([]Book, error)
+	FetchByCategory(categoryName string) (uint, error)
 	FetchNewestBooks() ([]Book, error)
+	FetchBooksByCategory(categoryId uint) ([]Book, error)
 }
 
 type services struct {
@@ -24,7 +27,7 @@ func (s *services) AddBook(req *request) (Book, error) {
 	book.Description = req.Description
 	book.Author = req.Author
 	book.Year = req.Year
-	book.IdCategory = req.IdCategory
+	book.CategoryId = req.CategoryId
 	book.Stock = req.Stock
 	book.Status = req.Status
 	book.CreatedAt = time.Now()
@@ -52,10 +55,34 @@ func (s *services) FetchBooks() ([]Book, error) {
 func (s *services) FetchNewestBooks() ([]Book, error) {
 	var books []Book
 
-	books, err := s.repository.FetchByNewest()
+	books, err := s.repository.FindByNewest()
 	if err != nil {
 		return books, err
 	}
 
 	return books, nil
+}
+
+func (s *services) FetchBooksByCategory(categoryId uint) ([]Book, error) {
+	var books []Book
+
+	books, err := s.repository.FetchByCategory(categoryId)
+	if err != nil {
+		return books, err
+	}
+
+	return books, nil
+}
+
+func (s *services) FetchByCategory(categoryName string) (uint, error) {
+	var category Category
+
+	category, err := s.repository.FindCategory(categoryName)
+	if err != nil {
+		return category.ID, err
+	}
+
+	fmt.Println(category.ID)
+
+	return category.ID, nil
 }

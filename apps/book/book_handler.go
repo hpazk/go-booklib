@@ -73,7 +73,12 @@ func (h *bookHandler) GetBooks(c echo.Context) error {
 	// TODO 1: get books
 	// TODO 2: get books by category
 	category := c.QueryParam("category")
-	fmt.Println(category)
+
+	if category != "" {
+		categoryId, _ := h.bookServices.FetchByCategory(category)
+		books, _ := h.bookServices.FetchBooksByCategory(categoryId)
+		return c.JSON(http.StatusOK, books)
+	}
 
 	books, _ := h.bookServices.FetchBooks()
 
