@@ -7,9 +7,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserProvider interface {
-	InitApp()
-}
+// type UserProvider interface {
+// 	InitApp()
+// }
 
 type UserApp struct {
 	Db *gorm.DB

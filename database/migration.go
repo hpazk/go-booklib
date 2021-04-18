@@ -1,6 +1,7 @@
 package database
 
 import (
+	"github.com/hpazk/go-booklib/apps/book"
 	"github.com/hpazk/go-booklib/apps/user"
 	"github.com/jinzhu/gorm"
 	"gopkg.in/gormigrate.v1"
@@ -14,9 +15,9 @@ func GetMigrations(db *gorm.DB) *gormigrate.Gormigrate {
 				if err := tx.AutoMigrate(&user.User{}).Error; err != nil {
 					return err
 				}
-				// if err := tx.AutoMigrate(&BlogModels.Blog{}).Error; err != nil {
-				// 	return err
-				// }
+				if err := tx.AutoMigrate(&book.Book{}).Error; err != nil {
+					return err
+				}
 				return nil
 			},
 			// Rollback: func(tx *gorm.DB) error {

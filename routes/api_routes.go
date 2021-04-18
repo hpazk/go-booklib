@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/hpazk/go-booklib/apps/book"
 	"github.com/hpazk/go-booklib/apps/user"
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/labstack/echo/v4"
@@ -9,6 +10,7 @@ import (
 func DefineApiRoutes(e *echo.Echo) {
 	handlers := []helper.Handler{
 		&user.UserApp{},
+		&book.BookApp{},
 	}
 
 	var routes []helper.Route

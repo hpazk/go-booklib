@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// TODO 1: timestamp store and response
+// TODO 1: timestamp db and response
 
 // User Entity
 type User struct {
@@ -54,24 +54,6 @@ type response struct {
 	AuthToken       string     `json:"auth_token"`
 }
 
-func userResponseFormatter(user User, authToken string) response {
-	formatter := response{
-		ID:              user.ID,
-		Name:            user.Name,
-		Address:         user.Address,
-		Photo:           user.Photo,
-		Email:           user.Email,
-		Role:            user.Role,
-		EmailVerifiedAt: user.EmailVerifiedAt,
-		CreatedAt:       user.CreatedAt,
-		UpdatedAt:       user.UpdatedAt,
-		DeletedAt:       user.DeletedAt,
-		AuthToken:       authToken,
-	}
-
-	return formatter
-}
-
 type loginResponse struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
@@ -79,17 +61,4 @@ type loginResponse struct {
 	Photo     string `json:"photo"`
 	Email     string `json:"email"`
 	AuthToken string `json:"auth_token"`
-}
-
-func userLoginResponseFormatter(user User, authToken string) loginResponse {
-	formatter := loginResponse{
-		ID:        user.ID,
-		Name:      user.Name,
-		Address:   user.Address,
-		Photo:     user.Photo,
-		Email:     user.Email,
-		AuthToken: authToken,
-	}
-
-	return formatter
 }
