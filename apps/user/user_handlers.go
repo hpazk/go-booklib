@@ -110,8 +110,8 @@ func (h *userHandler) PostUserLogin(c echo.Context) error {
 func (h *userHandler) PostUserPhoto(c echo.Context) error {
 
 	// TODO jwt: userId
-	userToken := c.Get("user").(*jwt.Token)
-	claims := userToken.Claims.(jwt.MapClaims)
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
 	id := uint(claims["user_id"].(float64))
 	// role := claims["user_role"]
 	// TODO image-validation
@@ -169,6 +169,15 @@ func (h *userHandler) PostUserPhoto(c echo.Context) error {
 
 // TODO error-handling
 func (h *userHandler) GetUsers(c echo.Context) error {
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
+	role := claims["user_role"]
+
+	if role != "admin" {
+		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
+		return c.JSON(http.StatusUnauthorized, response)
+	}
+
 	if findByEmail := c.QueryParam("email"); findByEmail != "" {
 		email := c.QueryParam("email")
 
@@ -180,23 +189,37 @@ func (h *userHandler) GetUsers(c echo.Context) error {
 			return c.JSON(http.StatusOK, response)
 		}
 	}
-	userToken := c.Get("user").(*jwt.Token)
-	claims := userToken.Claims.(jwt.MapClaims)
-	id := claims["user_id"]
-	role := claims["user_role"]
-	fmt.Println(id, role)
+
 	// TODO response-formatter
 	response, _ := h.userServices.FetchUsers()
 	return c.JSON(http.StatusOK, response)
 }
 
 func (h *userHandler) GetUser(c echo.Context) error {
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
+	role := claims["user_role"]
+
+	if role != "admin" {
+		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
+		return c.JSON(http.StatusUnauthorized, response)
+	}
+
 	id, _ := strconv.Atoi(c.Param("id"))
 	response, _ := h.userServices.FetchUserById(uint(id))
 	return c.JSON(http.StatusOK, response)
 }
 
 func (h *userHandler) PutUser(c echo.Context) error {
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
+	role := claims["user_role"]
+
+	if role != "admin" {
+		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
+		return c.JSON(http.StatusUnauthorized, response)
+	}
+
 	id, _ := strconv.Atoi(c.Param("id"))
 	req := new(updateRequest)
 
@@ -220,6 +243,15 @@ func (h *userHandler) PutUser(c echo.Context) error {
 }
 
 func (h *userHandler) DeleteUser(c echo.Context) error {
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
+	role := claims["user_role"]
+
+	if role != "admin" {
+		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
+		return c.JSON(http.StatusUnauthorized, response)
+	}
+
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.userServices.DeleteUser(uint(id)); err != nil {
 		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", err, nil)

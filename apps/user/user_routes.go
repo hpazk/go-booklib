@@ -13,8 +13,6 @@ func (r *UserRoutes) Route() []helper.Route {
 	// db := database.GetDbInstance()
 	// db.AutoMigrate(User{})
 	// userRepo := NewRepository(db)
-	// userService := NewServices(userRepo)
-	// authService := auth.NewAuthService()
 
 	repos := UserRepository(&UsersStorage{})
 	userservice := UserService(repos)
@@ -23,6 +21,7 @@ func (r *UserRoutes) Route() []helper.Route {
 	handler := UserHandler(userservice, authService)
 
 	// TODO jwt: OK
+	// TODO jwt: custom-error
 	// TODO token-validation
 	// fmt.Println(authService.GetAccessToken(1, "admin"))
 	// token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6Im1lbWJlciIsImV4cCI6MTYxODY4OTQwMywiaWF0IjoxNjE4Njc4NjAzfQ.FSRmtEvBspQisJen2hk0MvPtVKEpWUQpZBvwHoKe8ow")
@@ -35,8 +34,6 @@ func (r *UserRoutes) Route() []helper.Route {
 	// } else {
 	// 	fmt.Println("Token is Invalid")
 	// }
-
-	// userHandler := NewHandler(userService, authService)
 
 	return []helper.Route{
 		{
@@ -62,19 +59,22 @@ func (r *UserRoutes) Route() []helper.Route {
 			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 		{
-			Method:  echo.GET,
-			Path:    "/users/:id",
-			Handler: handler.GetUser,
+			Method:     echo.GET,
+			Path:       "/users/:id",
+			Handler:    handler.GetUser,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 		{
-			Method:  echo.PUT,
-			Path:    "/users/:id",
-			Handler: handler.PutUser,
+			Method:     echo.PUT,
+			Path:       "/users/:id",
+			Handler:    handler.PutUser,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 		{
-			Method:  echo.DELETE,
-			Path:    "/users/:id",
-			Handler: handler.DeleteUser,
+			Method:     echo.DELETE,
+			Path:       "/users/:id",
+			Handler:    handler.DeleteUser,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 	}
 }
