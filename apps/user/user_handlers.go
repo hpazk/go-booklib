@@ -15,7 +15,7 @@ import (
 // TODO 1: payload validator: OK
 // TODO 2: existEmail validatator
 // TODO 3: createUser service: OK
-// TODO 3: authToken service
+// TODO 3: authToken service: OK
 // TODO 4: response formatter: OK
 // TODO 5: api response formatter: OK
 // TODO 6: error handling and error-response formatter: OK

@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/hpazk/go-booklib/apps"
-	"github.com/hpazk/go-booklib/database"
 	"github.com/hpazk/go-booklib/helper"
 	"github.com/hpazk/go-booklib/routes"
 	"github.com/labstack/echo/v4"
@@ -44,22 +42,10 @@ func main() {
 		return c.JSON(http.StatusOK, helper.M{"message": "success"})
 	})
 
-	// Db
-	db := database.GetDbInstance()
-	dbMigration := database.GetMigrations(db)
-	err := dbMigration.Migrate()
-	if err == nil {
-		fmt.Println("Migrations did run successfully")
-	} else {
-		fmt.Println("migrations failed.", err)
-	}
-
-	apps.AppInit(db)
+	apps.AppInit()
 	// Routes
 	routes.DefineApiRoutes(e)
 
-	// e.GET("/books", book.GetBooks)
-	// e.GET("/books/newest", book.GetNewestBooks)
-
+	// Run server
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }
