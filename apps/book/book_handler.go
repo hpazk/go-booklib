@@ -110,6 +110,15 @@ func (h *bookHandler) GetNewestBooks(c echo.Context) error {
 }
 
 func (h *bookHandler) PutBook(c echo.Context) error {
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
+	role := claims["user_role"]
+
+	if role != "admin" {
+		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
+		return c.JSON(http.StatusUnauthorized, response)
+	}
+
 	id, _ := strconv.Atoi(c.Param("id"))
 	req := new(request)
 
@@ -143,6 +152,15 @@ func (h *bookHandler) PutBook(c echo.Context) error {
 }
 
 func (h *bookHandler) DeleteBook(c echo.Context) error {
+	accessToken := c.Get("user").(*jwt.Token)
+	claims := accessToken.Claims.(jwt.MapClaims)
+	role := claims["user_role"]
+
+	if role != "admin" {
+		response := helper.ResponseFormatter(http.StatusUnauthorized, "fail", "Please provide valid credentials", nil)
+		return c.JSON(http.StatusUnauthorized, response)
+	}
+
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.bookServices.RemoveBook(uint(id))

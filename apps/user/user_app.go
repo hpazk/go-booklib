@@ -48,6 +48,12 @@ func (r *UserApp) Route() []helper.Route {
 		},
 		{
 			Method:     echo.POST,
+			Path:       "/logout",
+			Handler:    handler.PostUserLogout,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
+		},
+		{
+			Method:     echo.POST,
 			Path:       "/user/upload/photo",
 			Handler:    handler.PostUserPhoto,
 			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},

@@ -43,14 +43,16 @@ func (r *BookApp) Route() []helper.Route {
 			Handler: handler.GetNewestBooks,
 		},
 		{
-			Method:  echo.PUT,
-			Path:    "/books/:id",
-			Handler: handler.PutBook,
+			Method:     echo.PUT,
+			Path:       "/books/:id",
+			Handler:    handler.PutBook,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 		{
-			Method:  echo.DELETE,
-			Path:    "/books/:id",
-			Handler: handler.DeleteBook,
+			Method:     echo.DELETE,
+			Path:       "/books/:id",
+			Handler:    handler.DeleteBook,
+			Middleware: []echo.MiddlewareFunc{auth.JwtMiddleWare()},
 		},
 	}
 }

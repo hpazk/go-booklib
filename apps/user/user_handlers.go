@@ -121,6 +121,10 @@ func (h *userHandler) PostUserLogin(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+func (h *userHandler) PostUserLogout(c echo.Context) error {
+	return c.JSON(http.StatusOK, helper.M{"message": "user-logout"})
+}
+
 // Upload Photo Handler
 func (h *userHandler) PostUserPhoto(c echo.Context) error {
 	accessToken := c.Get("user").(*jwt.Token)
