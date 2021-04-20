@@ -151,8 +151,6 @@ func (h *userHandler) PostUserPhoto(c echo.Context) error {
 	defer src.Close()
 
 	ext := string(photo.Filename[len(photo.Filename)-3:])
-
-	// TODO file-name
 	photoPath := fmt.Sprintf("public/images/%d-%s.%s", id, user.Name, ext)
 
 	// Destination

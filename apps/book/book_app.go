@@ -42,5 +42,15 @@ func (r *BookApp) Route() []helper.Route {
 			Path:    "/books/newest",
 			Handler: handler.GetNewestBooks,
 		},
+		{
+			Method:  echo.PUT,
+			Path:    "/books/:id",
+			Handler: handler.PutBook,
+		},
+		{
+			Method:  echo.DELETE,
+			Path:    "/books/:id",
+			Handler: handler.DeleteBook,
+		},
 	}
 }

@@ -1,14 +1,14 @@
 package book
 
 import (
-	"fmt"
 	"time"
 )
 
 type BookServices interface {
 	AddBook(req *request) (Book, error)
+	EditBook(id uint, req *request) (Book, error)
+	RemoveBook(id uint) error
 	FetchBooks() ([]Book, error)
-	FetchByCategory(categoryName string) (uint, error)
 	FetchNewestBooks() ([]Book, error)
 	FetchBooksByCategory(category string) ([]Book, error)
 }
@@ -74,15 +74,31 @@ func (s *services) FetchBooksByCategory(category string) ([]Book, error) {
 	return books, nil
 }
 
-func (s *services) FetchByCategory(categoryName string) (uint, error) {
-	var category Category
+func (s *services) EditBook(id uint, req *request) (Book, error) {
+	book := Book{}
+	book.ID = id
+	book.Title = req.Title
+	book.Description = req.Description
+	book.Author = req.Author
+	book.Year = req.Year
+	book.CategoryID = req.CategoryID
+	book.Stock = req.Stock
+	book.Status = req.Status
+	book.CreatedAt = time.Now()
+	book.UpdatedAt = time.Now()
 
-	category, err := s.repository.FindCategory(categoryName)
+	editedBook, err := s.repository.Update(book)
 	if err != nil {
-		return category.ID, err
+		return editedBook, err
 	}
 
-	fmt.Println(category.ID)
+	return editedBook, nil
+}
 
-	return category.ID, nil
+func (s *services) RemoveBook(id uint) error {
+	err := s.repository.Delete(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -13,8 +13,8 @@ type bookRepository interface {
 	FetchByCategory(category string) ([]Book, error)
 	FindCategory(categoryName string) (Category, error)
 	FindByNewest() ([]Book, error)
-	// Update(book Book) (Book, error)
-	// Delete(id uint) error
+	Update(book Book) (Book, error)
+	Delete(id uint) error
 	// FindById(id uint) (Book, error)
 }
 
@@ -105,8 +105,16 @@ func (r *repository) Update(book Book) (Book, error) {
 	return book, nil
 }
 
-// // Delete User
-// func (r *repository) Delete(id uint) error {
+func (r *repository) Delete(id uint) error {
+	var book Book
+	err := r.db.Delete(&book, id).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // 	usersStorage[id-1] = usersStorage[len(usersStorage)-1]
 // 	usersStorage[uint(len(usersStorage))-1] = User{}
 // 	usersStorage = usersStorage[:uint(len(usersStorage))-1]
