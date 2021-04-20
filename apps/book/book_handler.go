@@ -70,19 +70,43 @@ func (h *bookHandler) GetBooks(c echo.Context) error {
 
 	if category != "" {
 		// categoryId, _ := h.bookServices.FetchByCategory(category)
-		books, _ := h.bookServices.FetchBooksByCategory(category)
-		return c.JSON(http.StatusOK, books)
+		books, err := h.bookServices.FetchBooksByCategory(category)
+		if err != nil {
+			response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", err.Error(), nil)
+			return c.JSON(http.StatusInternalServerError, response)
+		}
+
+		booksData := booksResponseFormatter(books)
+
+		response := helper.ResponseFormatter(http.StatusOK, "success", "book successfully fetched", booksData)
+		return c.JSON(http.StatusOK, response)
 	}
 
-	books, _ := h.bookServices.FetchBooks()
+	books, err := h.bookServices.FetchBooks()
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", err.Error(), nil)
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
-	return c.JSON(http.StatusOK, books)
+	booksData := booksResponseFormatter(books)
+
+	response := helper.ResponseFormatter(http.StatusOK, "success", "book successfully fetched", booksData)
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *bookHandler) GetNewestBooks(c echo.Context) error {
-	books, _ := h.bookServices.FetchNewestBooks()
+	books, err := h.bookServices.FetchNewestBooks()
+	if err != nil {
+		response := helper.ResponseFormatter(http.StatusInternalServerError, "fail", err.Error(), nil)
+		return c.JSON(http.StatusInternalServerError, response)
+	}
 
-	return c.JSON(http.StatusOK, books)
+	booksData := booksResponseFormatter(books)
+
+	response := helper.ResponseFormatter(http.StatusOK, "success", "newest book successfully fetched", booksData)
+
+	return c.JSON(http.StatusOK, response)
 }
 
 func (h *bookHandler) PutBook(c echo.Context) error {

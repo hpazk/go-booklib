@@ -37,13 +37,14 @@ type request struct {
 
 type response struct {
 	ID          uint       `json:"id"`
-	Title       string     `json:"title" validate:"required"`
-	Description string     `json:"description" validate:"required"`
-	Author      string     `json:"author" validate:"required"`
-	Year        int        `json:"year" validate:"required"`
-	CategoryID  int        `json:"category_id" validate:"required"`
-	Stock       int        `json:"stock" validate:"required"`
-	Status      string     `json:"status" validate:"required"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Author      string     `json:"author"`
+	Year        int        `json:"year"`
+	CategoryID  int        `json:"category_id"`
+	Category    string     `json:"category"`
+	Stock       int        `json:"stock"`
+	Status      string     `json:"status"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 	DeletedAt   *time.Time `json:"deleted_at"`
