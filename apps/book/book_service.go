@@ -10,7 +10,7 @@ type BookServices interface {
 	FetchBooks() ([]Book, error)
 	FetchByCategory(categoryName string) (uint, error)
 	FetchNewestBooks() ([]Book, error)
-	FetchBooksByCategory(categoryId uint) ([]Book, error)
+	FetchBooksByCategory(category string) ([]Book, error)
 }
 
 type services struct {
@@ -27,7 +27,7 @@ func (s *services) AddBook(req *request) (Book, error) {
 	book.Description = req.Description
 	book.Author = req.Author
 	book.Year = req.Year
-	book.CategoryId = req.CategoryId
+	book.CategoryID = req.CategoryID
 	book.Stock = req.Stock
 	book.Status = req.Status
 	book.CreatedAt = time.Now()
@@ -63,10 +63,10 @@ func (s *services) FetchNewestBooks() ([]Book, error) {
 	return books, nil
 }
 
-func (s *services) FetchBooksByCategory(categoryId uint) ([]Book, error) {
+func (s *services) FetchBooksByCategory(category string) ([]Book, error) {
 	var books []Book
 
-	books, err := s.repository.FetchByCategory(categoryId)
+	books, err := s.repository.FetchByCategory(category)
 	if err != nil {
 		return books, err
 	}

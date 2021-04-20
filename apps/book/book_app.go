@@ -11,13 +11,13 @@ type BookApp struct {
 	Db *gorm.DB
 }
 
-func BookInit(db *gorm.DB) *BookApp {
+func InitApp(db *gorm.DB) *BookApp {
 	return &BookApp{db}
 }
 
 var handler *bookHandler
 
-func (r *BookApp) InitApp() {
+func (r *BookApp) UseApp() {
 	repository := BookRepository(r.Db)
 	bookservice := BookService(repository)
 

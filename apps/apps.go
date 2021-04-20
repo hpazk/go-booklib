@@ -23,10 +23,10 @@ func AppInit(e *echo.Echo) {
 	}
 
 	// Apps
-	userApp := user.UserInit(db)
-	bookApp := book.BookInit(db)
-	userApp.InitApp()
-	bookApp.InitApp()
+	userApp := user.InitApp(db)
+	bookApp := book.InitApp(db)
+	userApp.UseApp()
+	bookApp.UseApp()
 
 	// Route App Handler
 	handlers := []helper.Handler{

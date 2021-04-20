@@ -12,9 +12,10 @@ type Book struct {
 	Description string
 	Author      string
 	Year        int
-	CategoryId  int
+	CategoryID  int
 	Stock       int
 	Status      string
+	Category    Category
 }
 
 type Category struct {
@@ -29,22 +30,21 @@ type request struct {
 	Description string `json:"description" validate:"required"`
 	Author      string `json:"author" validate:"required"`
 	Year        int    `json:"year" validate:"required"`
-	CategoryId  int    `json:"category_id" validate:"required"`
+	CategoryID  int    `json:"category_id" validate:"required"`
 	Stock       int    `json:"stock" validate:"required"`
 	Status      string `json:"status" validate:"required"`
 }
 
 type response struct {
-	ID              uint       `json:"id"`
-	Title           string     `json:"title" validate:"required"`
-	Description     string     `json:"description" validate:"required"`
-	Author          string     `json:"author" validate:"required"`
-	Year            int        `json:"year" validate:"required"`
-	CategoryId      int        `json:"category_id" validate:"required"`
-	Stock           int        `json:"stock" validate:"required"`
-	Status          string     `json:"status" validate:"required"`
-	EmailVerifiedAt time.Time  `json:"email_verified_at"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
-	DeletedAt       *time.Time `json:"deleted_at"`
+	ID          uint       `json:"id"`
+	Title       string     `json:"title" validate:"required"`
+	Description string     `json:"description" validate:"required"`
+	Author      string     `json:"author" validate:"required"`
+	Year        int        `json:"year" validate:"required"`
+	CategoryID  int        `json:"category_id" validate:"required"`
+	Stock       int        `json:"stock" validate:"required"`
+	Status      string     `json:"status" validate:"required"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
 }

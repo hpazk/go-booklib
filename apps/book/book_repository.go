@@ -10,7 +10,7 @@ import (
 type bookRepository interface {
 	Store(bokk Book) (Book, error)
 	Fetch() ([]Book, error)
-	FetchByCategory(categoryId uint) ([]Book, error)
+	FetchByCategory(category string) ([]Book, error)
 	FindCategory(categoryName string) (Category, error)
 	FindByNewest() ([]Book, error)
 	// Update(book Book) (Book, error)
@@ -61,7 +61,7 @@ func (r *repository) FindCategory(categoryName string) (Category, error) {
 
 func (r *repository) FindByNewest() ([]Book, error) {
 	var books []Book
-	err := r.db.Where("year >= ?", time.Now().Year()-2).Find(&books).Error
+	err := r.db.Where("year >= ?", time.Now().Year()-2).Limit(20).Find(&books).Error
 	if err != nil {
 		return books, err
 	}
@@ -69,12 +69,16 @@ func (r *repository) FindByNewest() ([]Book, error) {
 	return books, nil
 }
 
-func (r *repository) FetchByCategory(categoryId uint) ([]Book, error) {
+func (r *repository) FetchByCategory(category string) ([]Book, error) {
 	var books []Book
-	err := r.db.Where("category_id = ?", categoryId).Find(&books).Error
+
+	err := r.db.Raw("SELECT * FROM books WHERE category_id = (SELECT id FROM categories WHERE name = ?)", category).Scan(&books).Error
 	if err != nil {
-		return books, err
+		return books, nil
 	}
+
+	fmt.Println(len(books))
+	fmt.Println(category)
 
 	return books, nil
 }

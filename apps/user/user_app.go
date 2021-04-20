@@ -15,13 +15,13 @@ type UserApp struct {
 	Db *gorm.DB
 }
 
-func UserInit(db *gorm.DB) *UserApp {
+func InitApp(db *gorm.DB) *UserApp {
 	return &UserApp{db}
 }
 
 var handler *userHandler
 
-func (r *UserApp) InitApp() {
+func (r *UserApp) UseApp() {
 	repository := UserRepository(r.Db)
 	userservice := UserService(repository)
 	authService := auth.AuthService()
