@@ -3,7 +3,7 @@ package book
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Book struct {
@@ -36,16 +36,16 @@ type request struct {
 }
 
 type response struct {
-	ID          uint       `json:"id"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Author      string     `json:"author"`
-	Year        int        `json:"year"`
-	CategoryID  int        `json:"category_id"`
-	Category    string     `json:"category"`
-	Stock       int        `json:"stock"`
-	Status      string     `json:"status"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
-	DeletedAt   *time.Time `json:"deleted_at"`
+	ID          uint           `json:"id"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	Author      string         `json:"author"`
+	Year        int            `json:"year"`
+	CategoryID  int            `json:"category_id"`
+	Category    string         `json:"category"`
+	Stock       int            `json:"stock"`
+	Status      string         `json:"status"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"deleted_at"`
 }

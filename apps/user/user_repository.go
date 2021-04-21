@@ -1,8 +1,6 @@
 package user
 
-import (
-	"github.com/jinzhu/gorm"
-)
+import "gorm.io/gorm"
 
 type userRepository interface {
 	Store(user User) (User, error)

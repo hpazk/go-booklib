@@ -3,8 +3,8 @@ package book
 import (
 	"github.com/hpazk/go-booklib/auth"
 	"github.com/hpazk/go-booklib/helper"
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type BookApp struct {

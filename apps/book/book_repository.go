@@ -3,7 +3,7 @@ package book
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type bookRepository interface {
@@ -58,7 +58,8 @@ func (r *repository) FindByNewest() ([]Book, error) {
 func (r *repository) FetchByCategory(category string) ([]Book, error) {
 	var books []Book
 
-	err := r.db.Raw("SELECT * FROM books, WHERE category_id = (SELECT id FROM categories WHERE name = ?)", category).Scan(&books).Error
+	// err := r.db.Raw("SELECT * FROM books, WHERE category_id = (SELECT id FROM categories WHERE name = ?)", category).Scan(&books).Error
+	err := r.db.Joins("Category").Where("name = ?", category).Find(&books).Error
 	if err != nil {
 		return books, nil
 	}
